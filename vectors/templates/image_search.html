@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Vector Image Search</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <style>
+        /* Existing Styles */
+
+        .product-grid {
+            width: 100%;
+        }
+
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .product-item {
+            flex: 0 0 25%;
+            box-sizing: border-box;
+            margin: 10px 0;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product-image {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .product-item {
+                flex: 0 0 33.33%;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .product-item {
+                flex: 0 0 50%;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .product-item {
+                flex: 0 0 100%;
+            }
+        }
+
+        .image-upload-form {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .image-upload-input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .image-upload-submit {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .image-upload-submit:hover {
+            background-color: #45a049;
+        }
+
+        /* New Styles for Image Preview */
+        .image-preview {
+            margin-top: 10px;
+            max-width: 100%;
+            max-height: 300px;
+            display: none; /* Hidden by default */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Optional: Style for the preview container */
+        .image-preview-container {
+            text-align: center;
+        }
+    </style>
+    
+    <!-- JavaScript for Image Preview -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageInput = document.getElementById('image');
+            const imagePreview = document.getElementById('image-preview');
+
+            imageInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.src = '';
+                    imagePreview.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Image Search</h1>
+    <form method="post" enctype="multipart/form-data" class="image-upload-form">
+        {% csrf_token %}
+        <input type="file" name="image" id="image" class="image-upload-input" accept="image/*">
+        
+        <!-- Image Preview Container -->
+        <div class="image-preview-container">
+            <img id="image-preview" class="image-preview" alt="Image Preview">
+        </div>
+        
+        <input type="submit" value="Search" class="image-upload-submit">
+    </form>
+
+    <h2>Results</h2>
+    <div class="product-grid">
+        {% if products %}
+            <ul class="product-list">
+                {% for product in products %}
+                    <li class="product-item">
+                        <div class="product-title">{{ product.title }}</div>
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-image">
+                        {% else %}
+                            <p>No image found</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No products found</p>
+        {% endif %}
+    </div>
+   
+</body>
+</html>
