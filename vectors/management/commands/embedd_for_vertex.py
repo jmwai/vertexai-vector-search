@@ -1,20 +1,14 @@
 import os
-import json
 import csv
-from sentence_transformers import SentenceTransformer
-from django.core.management.base import BaseCommand
-from vectors.models import Product
-from django.core.files import File
-
-from django.conf import settings
-from sentence_transformers import SentenceTransformer
-from django.core.management.base import BaseCommand
-from vectors.models import Product
-from django.core.files import File
 from PIL import Image
 from io import BytesIO
 import requests
-from itertools import islice
+from sentence_transformers import SentenceTransformer
+from django.core.management.base import BaseCommand
+
+
+from django.conf import settings
+
 
 
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
@@ -30,9 +24,15 @@ class Command(BaseCommand):
             for line in reader:
                 code = line[0]
                 title = line[1]
+                url = line[2]
+                response = requests.get(url)
+                image = Image.open(BytesIO(response.content)).convert('RGB')
+
+                image_embedding = image_model.encode([image], convert_to_tensor=True)
                 title_embedding = model.encode([title])
+
                 print(f"Title: {title}, Embedding: {title_embedding}")
                 #write to csv
                 with open('embeddings.csv', mode='a') as file:
                     writer = csv.writer(file)
-                    writer.writerow([code, title, title_embedding[0]])
+                    writer.writerow([code, title, image_embedding[0]])

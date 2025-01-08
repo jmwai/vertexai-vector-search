@@ -38,9 +38,9 @@ class Command(BaseCommand):
             display_name=INDEX_ENDPOINT_NAME,
             public_endpoint_enabled=True
         )
-        print(my_index_endpoint)
+        # print(my_index_endpoint)
 
-        # deploy the Index to the Index Endpoint
+        # # deploy the Index to the Index Endpoint
 
         my_index_endpoint.deploy_index(
             index=my_index, deployed_index_id=INDEX_ENDPOINT_NAME
